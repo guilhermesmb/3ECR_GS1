@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciamento de Gastos de Água</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Gerenciamento de Gastos de Água</h1>
+
+  <form id="expenseForm">
+    <label for="date">Data:</label>
+    <input type="date" id="date" required>
+
+    <label for="value">Valor:</label>
+    <input type="number" id="value" min="0" required>
+
+    <label for="category">Categoria:</label>
+    <select id="category" required>
+      <option value="banho">Banho</option>
+      <option value="cozinha">Cozinha</option>
+      <option value="limpeza">Limpeza</option>
+    </select>
+
+    <button type="submit">Salvar</button>
+  </form>
+
+  <div id="filterSection">
+    <h2>Filtro de Gastos</h2>
+    <input type="text" id="filterInput" placeholder="Digite um termo de busca">
+  </div>
+
+  <h2>Gastos Registrados</h2>
+  <ul id="expenseList"></ul>
+
+  <div id="summarySection">
+    <h2>Resumo de Gastos</h2>
+    <div id="totalExpense"></div>
+    <div id="expenseAnalysis"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
