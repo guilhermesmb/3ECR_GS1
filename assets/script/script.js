@@ -1,154 +1,153 @@
 // Acessando o formulário
-const expenseForm = document.getElementById('expenseForm');
+const formularioDespesa = document.getElementById('formularioDespesa');
 // Acessando a lista de gastos
-const expenseList = document.getElementById('expenseList');
+const listaDespesas = document.getElementById('listaDespesas');
 // Acessando a seção de resumo de gastos
-const totalExpenseSection = document.getElementById('totalExpense');
-const expenseAnalysisSection = document.getElementById('expenseAnalysis');
+const totalDespesasSecao = document.getElementById('totalDespesas');
+const analiseDespesasSecao = document.getElementById('analiseDespesas');
 // Acessando a caixa de texto de busca/filtro
-const filterInput = document.getElementById('filterInput');
+const inputFiltro = document.getElementById('inputFiltro');
 
 // Evento de envio do formulário
-expenseForm.addEventListener('submit', function(event) {
+formularioDespesa.addEventListener('submit', function(event) {
   event.preventDefault();
 
   // Obtendo os valores dos campos
-  const date = document.getElementById('date').value;
-  const value = parseFloat(document.getElementById('value').value);
-  const category = document.getElementById('category').value;
+  const data = document.getElementById('data').value;
+  const valor = parseFloat(document.getElementById('valor').value);
+  const categoria = document.getElementById('categoria').value;
 
   // Criando um objeto com os dados da despesa
-  const expense = {
-    date: date,
-    value: value,
-    category: category
+  const despesa = {
+    data: data,
+    valor: valor,
+    categoria: categoria
   };
 
   // Salvando a despesa no local storage
-  saveExpense(expense);
+  salvarDespesa(despesa);
 
   // Limpando os campos do formulário
-  expenseForm.reset();
+  formularioDespesa.reset();
 
   // Atualizando a lista de gastos e resumo
-  updateExpenseList();
-  updateExpenseSummary();
+  atualizarListaDespesas();
+  atualizarResumoDespesas();
 });
 
 // Função para salvar a despesa no local storage
-function saveExpense(expense) {
-  let expenses = [];
+function salvarDespesa(despesa) {
+  let despesas = [];
 
-  if (localStorage.getItem('expenses')) {
-    expenses = JSON.parse(localStorage.getItem('expenses'));
+  if (localStorage.getItem('despesas')) {
+    despesas = JSON.parse(localStorage.getItem('despesas'));
   }
 
-  expenses.push(expense);
-  localStorage.setItem('expenses', JSON.stringify(expenses));
+  despesas.push(despesa);
+  localStorage.setItem('despesas', JSON.stringify(despesas));
 }
 
 // Função para atualizar a lista de gastos
-function updateExpenseList() {
-  expenseList.innerHTML = '';
+function atualizarListaDespesas() {
+  listaDespesas.innerHTML = '';
 
-  if (localStorage.getItem('expenses')) {
-    const expenses = JSON.parse(localStorage.getItem('expenses'));
+  if (localStorage.getItem('despesas')) {
+    const despesas = JSON.parse(localStorage.getItem('despesas'));
 
-    expenses.forEach((expense, index) => {
+    despesas.forEach((despesa, index) => {
       const listItem = document.createElement('li');
       listItem.innerHTML = `
-        <strong>Data:</strong> ${expense.date} |
-        <strong>Valor:</strong> ${expense.value.toFixed(2)} |
-        <strong>Categoria:</strong> ${expense.category} |
-        <button onclick="deleteExpense(${index})">Excluir</button>
+        <strong>Data:</strong> ${despesa.data} |
+        <strong>Valor:</strong> ${despesa.valor.toFixed(2)} |
+        <strong>Categoria:</strong> ${despesa.categoria} |
+        <button onclick="excluirDespesa(${index})">Excluir</button>
       `;
 
-      expenseList.appendChild(listItem);
+      listaDespesas.appendChild(listItem);
     });
   }
 }
 
-// Função para excluir um gasto
-function deleteExpense(index) {
-  let expenses = [];
+// Função para excluir uma despesa
+function excluirDespesa(index) {
+  let despesas = [];
 
-  if (localStorage.getItem('expenses')) {
-    expenses = JSON.parse(localStorage.getItem('expenses'));
+  if (localStorage.getItem('despesas')) {
+    despesas = JSON.parse(localStorage.getItem('despesas'));
   }
 
-  expenses.splice(index, 1);
-  localStorage.setItem('expenses', JSON.stringify(expenses));
+  despesas.splice(index, 1);
+  localStorage.setItem('despesas', JSON.stringify(despesas));
 
-  updateExpenseList();
-  updateExpenseSummary();
+  atualizarListaDespesas();
+  atualizarResumoDespesas();
 }
 
 // Função para atualizar o resumo de gastos
-function updateExpenseSummary() {
-  if (localStorage.getItem('expenses')) {
-    const expenses = JSON.parse(localStorage.getItem('expenses'));
+function atualizarResumoDespesas() {
+  if (localStorage.getItem('despesas')) {
+    const despesas = JSON.parse(localStorage.getItem('despesas'));
 
-    if (expenses.length > 0) {
-      // Total dos gastos
-      const total = expenses.reduce((sum, expense) => sum + expense.value, 0);
-      totalExpenseSection.innerHTML = `<strong>Total de Gastos:</strong> R$ ${total.toFixed(2)}`;
+    if (despesas.length > 0) {
+      // Total das despesas
+      const total = despesas.reduce((soma, despesa) => soma + despesa.valor, 0);
+      totalDespesasSecao.innerHTML = `<strong>Total de Despesas:</strong> R$ ${total.toFixed(2)}`;
 
       // Análise de consumo
-      const average = total / expenses.length;
-      const highestExpense = Math.max(...expenses.map(expense => expense.value));
-      const lowestExpense = Math.min(...expenses.map(expense => expense.value));
+      const media = total / despesas.length;
+      const maiorDespesa = Math.max(...despesas.map(despesa => despesa.valor));
+      const menorDespesa = Math.min(...despesas.map(despesa => despesa.valor));
 
-      expenseAnalysisSection.innerHTML = `
-        <strong>Média de Gastos:</strong> R$ ${average.toFixed(2)} |
-        <strong>Maior Gasto:</strong> R$ ${highestExpense.toFixed(2)} |
-        <strong>Menor Gasto:</strong> R$ ${lowestExpense.toFixed(2)}
+      analiseDespesasSecao.innerHTML = `
+        <strong>Média de Despesas:</strong> R$ ${media.toFixed(2)} |
+        <strong>Maior Despesa:</strong> R$ ${maiorDespesa.toFixed(2)} |
+        <strong>Menor Despesa:</strong> R$ ${menorDespesa.toFixed(2)}
       `;
     } else {
-      // Não há gastos registrados
-      totalExpenseSection.innerHTML = '<strong>Total de Gastos:</strong> R$ 0.00';
-      expenseAnalysisSection.innerHTML = 'Não há gastos registrados.';
+      // Não há despesas registradas
+      totalDespesasSecao.innerHTML = '<strong>Total de Despesas:</strong> R$ 0.00';
+      analiseDespesasSecao.innerHTML = 'Não há despesas registradas.';
     }
   } else {
-    // Não há gastos registrados
-    totalExpenseSection.innerHTML = '';
-    expenseAnalysisSection.innerHTML = 'Não há gastos registrados.';
+    // Não há despesas registradas
+    totalDespesasSecao.innerHTML = '';
+    analiseDespesasSecao.innerHTML = 'Não há despesas registradas.';
   }
 }
 
+// Função para buscar/filtrar despesas
+function filtrarDespesas() {
+  const termoFiltro = inputFiltro.value.toLowerCase();
 
-// Função para buscar/filtrar gastos
-function filterExpenses() {
-  const filterTerm = filterInput.value.toLowerCase();
+  if (localStorage.getItem('despesas')) {
+    const despesas = JSON.parse(localStorage.getItem('despesas'));
 
-  if (localStorage.getItem('expenses')) {
-    const expenses = JSON.parse(localStorage.getItem('expenses'));
-
-    const filteredExpenses = expenses.filter(expense =>
-      expense.date.toLowerCase().includes(filterTerm) ||
-      expense.value.toString().includes(filterTerm) ||
-      expense.category.toLowerCase().includes(filterTerm)
+    const despesasFiltradas = despesas.filter(despesa =>
+      despesa.data.toLowerCase().includes(termoFiltro) ||
+      despesa.valor.toString().includes(termoFiltro) ||
+      despesa.categoria.toLowerCase().includes(termoFiltro)
     );
 
-    expenseList.innerHTML = '';
+    listaDespesas.innerHTML = '';
 
-    filteredExpenses.forEach((expense, index) => {
+    despesasFiltradas.forEach((despesa, index) => {
       const listItem = document.createElement('li');
       listItem.innerHTML = `
-        <strong>Data:</strong> ${expense.date} |
-        <strong>Valor:</strong> ${expense.value.toFixed(2)} |
-        <strong>Categoria:</strong> ${expense.category} |
-        <button onclick="deleteExpense(${index})">Excluir</button>
+        <strong>Data:</strong> ${despesa.data} |
+        <strong>Valor:</strong> ${despesa.valor.toFixed(2)} |
+        <strong>Categoria:</strong> ${despesa.categoria} |
+        <button onclick="excluirDespesa(${index})">Excluir</button>
       `;
 
-      expenseList.appendChild(listItem);
+      listaDespesas.appendChild(listItem);
     });
   }
 }
 
 // Evento de digitação na caixa de texto de busca/filtro
-filterInput.addEventListener('keyup', filterExpenses);
+inputFiltro.addEventListener('keyup', filtrarDespesas);
 
 // Atualizar a lista de gastos, resumo e filtrar quando a página carregar
-updateExpenseList();
-updateExpenseSummary();
-filterExpenses();
+atualizarListaDespesas();
+atualizarResumoDespesas();
+filtrarDespesas();
