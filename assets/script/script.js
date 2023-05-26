@@ -14,7 +14,7 @@ expenseForm.addEventListener('submit', function(event) {
 
   // Obtendo os valores dos campos
   const date = document.getElementById('date').value;
-  const value = document.getElementById('value').value;
+  const value = parseFloat(document.getElementById('value').value);
   const category = document.getElementById('category').value;
 
   // Criando um objeto com os dados da despesa
@@ -58,7 +58,7 @@ function updateExpenseList() {
       const listItem = document.createElement('li');
       listItem.innerHTML = `
         <strong>Data:</strong> ${expense.date} |
-        <strong>Valor:</strong> ${expense.value} |
+        <strong>Valor:</strong> ${expense.value.toFixed(2)} |
         <strong>Categoria:</strong> ${expense.category} |
         <button onclick="deleteExpense(${index})">Excluir</button>
       `;
@@ -88,25 +88,33 @@ function updateExpenseSummary() {
   if (localStorage.getItem('expenses')) {
     const expenses = JSON.parse(localStorage.getItem('expenses'));
 
-    // Total dos gastos
-    const total = expenses.reduce((sum, expense) => sum + parseFloat(expense.value), 0);
-    totalExpenseSection.innerHTML = `<strong>Total de Gastos:</strong> R$ ${total.toFixed(2)}`;
+    if (expenses.length > 0) {
+      // Total dos gastos
+      const total = expenses.reduce((sum, expense) => sum + expense.value, 0);
+      totalExpenseSection.innerHTML = `<strong>Total de Gastos:</strong> R$ ${total.toFixed(2)}`;
 
-    // Análise de consumo
-    const average = total / expenses.length;
-    const highestExpense = Math.max(...expenses.map(expense => parseFloat(expense.value)));
-    const lowestExpense = Math.min(...expenses.map(expense => parseFloat(expense.value)));
+      // Análise de consumo
+      const average = total / expenses.length;
+      const highestExpense = Math.max(...expenses.map(expense => expense.value));
+      const lowestExpense = Math.min(...expenses.map(expense => expense.value));
 
-    expenseAnalysisSection.innerHTML = `
-      <strong>Média de Gastos:</strong> R$ ${average.toFixed(2)} |
-      <strong>Maior Gasto:</strong> R$ ${highestExpense.toFixed(2)} |
-      <strong>Menor Gasto:</strong> R$ ${lowestExpense.toFixed(2)}
-    `;
+      expenseAnalysisSection.innerHTML = `
+        <strong>Média de Gastos:</strong> R$ ${average.toFixed(2)} |
+        <strong>Maior Gasto:</strong> R$ ${highestExpense.toFixed(2)} |
+        <strong>Menor Gasto:</strong> R$ ${lowestExpense.toFixed(2)}
+      `;
+    } else {
+      // Não há gastos registrados
+      totalExpenseSection.innerHTML = '<strong>Total de Gastos:</strong> R$ 0.00';
+      expenseAnalysisSection.innerHTML = 'Não há gastos registrados.';
+    }
   } else {
+    // Não há gastos registrados
     totalExpenseSection.innerHTML = '';
-    expenseAnalysisSection.innerHTML = '';
+    expenseAnalysisSection.innerHTML = 'Não há gastos registrados.';
   }
 }
+
 
 // Função para buscar/filtrar gastos
 function filterExpenses() {
@@ -117,7 +125,7 @@ function filterExpenses() {
 
     const filteredExpenses = expenses.filter(expense =>
       expense.date.toLowerCase().includes(filterTerm) ||
-      expense.value.toLowerCase().includes(filterTerm) ||
+      expense.value.toString().includes(filterTerm) ||
       expense.category.toLowerCase().includes(filterTerm)
     );
 
@@ -127,7 +135,7 @@ function filterExpenses() {
       const listItem = document.createElement('li');
       listItem.innerHTML = `
         <strong>Data:</strong> ${expense.date} |
-        <strong>Valor:</strong> ${expense.value} |
+        <strong>Valor:</strong> ${expense.value.toFixed(2)} |
         <strong>Categoria:</strong> ${expense.category} |
         <button onclick="deleteExpense(${index})">Excluir</button>
       `;
